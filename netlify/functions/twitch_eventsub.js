@@ -16,11 +16,20 @@ async function twitchHandler(event, context) {
       statusCode: 200,
       body: body.challenge
     };
+  } else if (messageType === "notification") {
+    const {
+      event,
+      subscription: { type }
+    } = body;
+
+    console.log(
+      `Receiving ${type} request for ${event.broadcaster_user_name}: `,
+      event
+    );
   }
 
   return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Hello World" })
+    statusCode: 200
   };
 }
 
