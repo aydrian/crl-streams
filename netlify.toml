@@ -1,0 +1,10 @@
+[build]
+publish = "public"
+
+[[redirects]]
+from = "/webhooks/twitch"
+to = "/.netlify/functions/twitch_eventsub"
+status = 200
+
+[functions]
+node_bundler = "esbuild"
