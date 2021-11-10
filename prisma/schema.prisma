@@ -15,6 +15,7 @@ model Streamer {
   login             String         @db.VarChar(50)
   profile_image_url String         @db.VarChar(3000)
   subscriptions     Subscription[]
+  streams           Stream[]
 
   @@map(name: "streamers")
 }
@@ -28,7 +29,15 @@ model Subscription {
   @@map(name: "subscriptions")
 }
 
-// model Stream {
+model Stream {
+  id           String   @id @db.VarChar(25)
+  title        String
+  viewer_count Int      @default(0)
+  game_name    String
+  started_at   DateTime @db.Timestamptz
+  ended_at     DateTime @db.Timestamptz
+  streamer     Streamer @relation(fields: [streamer_id], references: [id])
+  streamer_id  String
 
-//   @@map(name: "streams")
-// }
+  @@map(name: "streams")
+}
