@@ -1,4 +1,7 @@
 import withVerifyTwitch from "../lib/withVerifyTwitch";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 async function twitchHandler(event, context) {
   if (event.httpMethod !== "POST") {
