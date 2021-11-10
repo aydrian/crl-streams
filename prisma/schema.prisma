@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Streamer {
+  id                String         @id
+  login             String         @db.VarChar(50)
+  profile_image_url String         @db.VarChar(3000)
+  subscriptions     Subscription[]
+
+  @@map(name: "streamers")
+}
+
+model Subscription {
+  id          String   @id @db.VarChar(25)
+  type        String   @db.VarChar(255)
+  streamer    Streamer @relation(fields: [streamer_id], references: [id])
+  streamer_id String
+
+  @@map(name: "subscriptions")
+}
+
+// model Stream {
+
+//   @@map(name: "streams")
+// }
