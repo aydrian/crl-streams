@@ -12,8 +12,8 @@ generator client {
 
 model Streamer {
   id                String         @id
-  login             String         @db.VarChar(50)
-  profile_image_url String         @db.VarChar(3000)
+  login             String         @db.VarChar
+  profile_image_url String         @db.VarChar
   subscriptions     Subscription[]
   streams           Stream[]
 
@@ -21,8 +21,8 @@ model Streamer {
 }
 
 model Subscription {
-  id          String   @id @db.VarChar(25)
-  type        String   @db.VarChar(255)
+  id          String   @id @db.VarChar
+  type        String   @db.VarChar
   streamer    Streamer @relation(fields: [streamer_id], references: [id])
   streamer_id String
 
@@ -30,7 +30,7 @@ model Subscription {
 }
 
 model Stream {
-  id           String   @id @db.VarChar(25)
+  id           String   @id @db.VarChar
   title        String
   viewer_count Int      @default(0)
   game_name    String
