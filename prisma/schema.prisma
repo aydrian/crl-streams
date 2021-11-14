@@ -1,43 +1,34 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model streamers {
+  id                String          @id
+  login             String
+  profile_image_url String
+  streams           streams[]
+  subscriptions     subscriptions[]
 }
 
-model Streamer {
-  id                String         @id
-  login             String         @db.VarChar
-  profile_image_url String         @db.VarChar
-  subscriptions     Subscription[]
-  streams           Stream[]
-
-  @@map(name: "streamers")
-}
-
-model Subscription {
-  id          String   @id @db.VarChar
-  type        String   @db.VarChar
-  streamer    Streamer @relation(fields: [streamer_id], references: [id])
+model streams {
+  id          String    @id
+  title       String?
+  view_count  BigInt?
+  game_name   String?
+  started_at  DateTime? @db.Timestamptz(6)
+  ended_at    DateTime? @db.Timestamptz(6)
   streamer_id String
-
-  @@map(name: "subscriptions")
+  streamer    streamers @relation(fields: [streamer_id], references: [id])
 }
 
-model Stream {
-  id           String   @id @db.VarChar
-  title        String
-  viewer_count Int      @default(0)
-  game_name    String
-  started_at   DateTime @db.Timestamptz
-  ended_at     DateTime @db.Timestamptz
-  streamer     Streamer @relation(fields: [streamer_id], references: [id])
-  streamer_id  String
-
-  @@map(name: "streams")
+model subscriptions {
+  id          String    @id
+  type        String
+  streamer_id String
+  streamer    streamers @relation(fields: [streamer_id], references: [id])
 }
