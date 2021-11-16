@@ -65,14 +65,17 @@ async function twitchHandler(event, context) {
     } else if (type === "stream.offline") {
       // Update stream ended_at where streamer_id equal broadcaster_user_id AND end_at is null
       const findFirstStream = await prisma.streams.findFirst({
+        orderBy: {
+          started_at: "desc"
+        },
+        select: {
+          id: true
+        },
         where: {
           streamer_id: event.broadcaster_user_id,
           AND: {
             ended_at: null
           }
-        },
-        select: {
-          id: true
         }
       });
       console.log("findFirstStream", findFirstStream);
