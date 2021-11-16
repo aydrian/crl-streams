@@ -35,48 +35,71 @@ async function twitchHandler(event, context) {
       const stream = await twitch.streams.getStreamByUserId(
         event.broadcaster_user_id
       );
-      console.log(`Stream Title: ${stream.title}`);
-      const streamer = await stream.getUser();
-      console.log(`Streamer: ${streamer.name}`);
-      const createStream = await prisma.streams.create({
-        data: {
-          id: stream.id,
-          title: stream.title,
-          view_count: stream.viewers,
-          game_name: stream.gameName,
-          started_at: stream.startDate,
-          streamer: {
-            connectOrCreate: {
-              create: {
-                id: streamer.id,
-                login: streamer.name,
-                profile_image_url: streamer.profilePictureUrl
-              },
-              where: {
-                id: streamer.id
+      if (stream) {
+        console.log(`Stream Title: ${stream.title}`);
+        const streamer = await stream.getUser();
+        console.log(`Streamer: ${streamer.name}`);
+        const createStream = await prisma.streams.create({
+          data: {
+            id: stream.id,
+            title: stream.title,
+            view_count: stream.viewers,
+            game_name: stream.gameName,
+            started_at: stream.startDate,
+            streamer: {
+              connectOrCreate: {
+                create: {
+                  id: streamer.id,
+                  login: streamer.name,
+                  profile_image_url: streamer.profilePictureUrl
+                },
+                where: {
+                  id: streamer.id
+                }
               }
             }
           }
+        });
+        console.log(createStream);
+      }
+    } else if (type === "stream.offline") {
+      // Update stream ended_at where streamer_id equal broadcaster_user_id AND end_at is null
+      const findFirstStream = await prisma.streams.findFirst({
+        where: {
+          streamer_id: event.broadcaster_user_id,
+          AND: {
+            ended_at: null
+          }
+        },
+        select: {
+          id: true
         }
       });
-      console.log(createStream);
-    }
-  } else if (type === "stream.offline") {
-    const {
-      data: [stream]
-    } = await twitch.streams.getStreams({
-      userId: event.broadcaster_user_id
-    });
-    console.log(`Stream Title: ${stream.title}`);
-    const updateStream = await prisma.streams.update({
-      data: {
-        ended_at: Date.now(),
-        view_count: stream.viewers
-      },
-      where: {
-        id: stream.id
+      console.log("findFirstStream", findFirstStream);
+      if (findFirstStream) {
+        const updateStream = await prisma.streams.update({
+          data: {
+            ended_at: new Date()
+          },
+          where: {
+            id: findFirstStream.id
+          },
+          select: {
+            id: true,
+            title: true,
+            game_name: true,
+            streamer: {
+              select: {
+                login: true,
+                profile_image_url: true
+              }
+            }
+          }
+        });
+
+        console.log(`Stream: `, updateStream);
       }
-    });
+    }
   }
 
   return {
