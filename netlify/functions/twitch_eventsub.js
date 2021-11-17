@@ -1,5 +1,6 @@
 import withVerifyTwitch from "../lib/withVerifyTwitch";
 import { PrismaClient } from "@prisma/client";
+import { WebClient } from "@slack/web-api";
 import { twitch } from "../lib/twitch";
 
 const prisma = new PrismaClient();
@@ -61,6 +62,54 @@ async function twitchHandler(event, context) {
           }
         });
         console.log(createStream);
+        const client = new WebClient();
+        const result = await client.chat.postMessage({
+          token: process.env.SLACK_BOT_TOKEN,
+          channel: "C02MY7DDHU1",
+          text: `${streamer.name} is online. ${stream.title} Come hang out! https://twitch.tv/${streamer.displayName}`,
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `🔴 ${streamer.name} is online. ${stream.title}`
+              },
+              accessory: {
+                type: "image",
+                image_url: `${streamer.profilePictureUrl.replace(
+                  "{width}x{height}",
+                  ""
+                )}`,
+                alt_text: `${streamer.name}`
+              }
+            },
+            {
+              type: "image",
+              image_url: `${stream.thumbnailUrl.replace(
+                "{width}x{height}",
+                "1280x720"
+              )}`,
+              alt_text: `${stream.title}`
+            },
+            {
+              type: "actions",
+              elements: [
+                {
+                  type: "button",
+                  text: {
+                    type: "plain_text",
+                    text: "Come hang out!",
+                    emoji: true
+                  },
+                  //value: "click_me_123",
+                  url: `https://twitch.tv/${streamer.displayName}`
+                  //action_id: "actionId-0"
+                }
+              ]
+            }
+          ]
+        });
+        console.log("Slack result: ", result);
       }
     } else if (type === "stream.offline") {
       // Update stream ended_at where streamer_id equal broadcaster_user_id AND end_at is null
