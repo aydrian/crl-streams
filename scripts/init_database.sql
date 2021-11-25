@@ -23,3 +23,10 @@ CREATE TABLE streams (
   ended_at TIMESTAMPTZ,
   streamer_id STRING NOT NULL REFERENCES streamers (id) ON DELETE CASCADE
 );
+
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel_id STRING NOT NULL,
+  message_ts STRING NOT NULL,
+  stream_id STRING NOT NULL REFERENCES streams (id) ON DELETE CASCADE
+);

@@ -11,10 +11,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "prisma": "^3.4.2"
+    "prisma": "^3.5.0"
   },
   "dependencies": {
-    "@prisma/client": "^3.4.2",
+    "@prisma/client": "^3.5.0",
     "@slack/web-api": "^6.5.0",
     "@twurple/api": "^5.0.9",
     "@twurple/auth": "^5.0.9"

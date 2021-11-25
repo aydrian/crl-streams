@@ -1,7 +1,6 @@
 import withVerifyTwitch from "../lib/withVerifyTwitch";
 import { PrismaClient } from "@prisma/client";
-import { WebClient } from "@slack/web-api";
-import { twitch } from "../lib/twitch";
+import { handleStreamOnline, handleStreamOffline } from "../lib/eventHandlers";
 
 const prisma = new PrismaClient();
 
@@ -33,124 +32,9 @@ async function twitchHandler(event, context) {
     );
 
     if (type === "stream.online") {
-      const stream = await twitch.streams.getStreamByUserId(
-        event.broadcaster_user_id
-      );
-      if (stream) {
-        console.log(`Stream Title: ${stream.title}`);
-        const streamer = await stream.getUser();
-        console.log(`Streamer: ${streamer.name}`);
-        const createStream = await prisma.streams.create({
-          data: {
-            id: stream.id,
-            title: stream.title,
-            view_count: stream.viewers,
-            game_name: stream.gameName,
-            started_at: stream.startDate,
-            streamer: {
-              connectOrCreate: {
-                create: {
-                  id: streamer.id,
-                  login: streamer.name,
-                  profile_image_url: streamer.profilePictureUrl
-                },
-                where: {
-                  id: streamer.id
-                }
-              }
-            }
-          }
-        });
-        console.log(createStream);
-        const client = new WebClient();
-        const result = await client.chat.postMessage({
-          token: process.env.SLACK_BOT_TOKEN,
-          channel: "C02MY7DDHU1",
-          text: `${streamer.name} is online. ${stream.title} Come hang out! https://twitch.tv/${streamer.displayName}`,
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: `🔴 ${streamer.name} is online. ${stream.title}`
-              },
-              accessory: {
-                type: "image",
-                image_url: `${streamer.profilePictureUrl.replace(
-                  "{width}x{height}",
-                  ""
-                )}`,
-                alt_text: `${streamer.name}`
-              }
-            },
-            {
-              type: "image",
-              image_url: `${stream.thumbnailUrl.replace(
-                "{width}x{height}",
-                "1280x720"
-              )}`,
-              alt_text: `${stream.title}`
-            },
-            {
-              type: "actions",
-              elements: [
-                {
-                  type: "button",
-                  text: {
-                    type: "plain_text",
-                    text: "Come hang out!",
-                    emoji: true
-                  },
-                  //value: "click_me_123",
-                  url: `https://twitch.tv/${streamer.displayName}`
-                  //action_id: "actionId-0"
-                }
-              ]
-            }
-          ]
-        });
-        console.log("Slack result: ", result);
-      }
+      await handleStreamOnline(event);
     } else if (type === "stream.offline") {
-      // Update stream ended_at where streamer_id equal broadcaster_user_id AND end_at is null
-      const findFirstStream = await prisma.streams.findFirst({
-        orderBy: {
-          started_at: "desc"
-        },
-        select: {
-          id: true
-        },
-        where: {
-          streamer_id: event.broadcaster_user_id,
-          AND: {
-            ended_at: null
-          }
-        }
-      });
-      console.log("findFirstStream", findFirstStream);
-      if (findFirstStream) {
-        const updateStream = await prisma.streams.update({
-          data: {
-            ended_at: new Date()
-          },
-          where: {
-            id: findFirstStream.id
-          },
-          select: {
-            id: true,
-            title: true,
-            game_name: true,
-            streamer: {
-              select: {
-                login: true,
-                profile_image_url: true
-              }
-            }
-          }
-        });
-
-        console.log(`Stream: `, updateStream);
-      }
+      await handleStreamOffline(event);
     }
   }
 
