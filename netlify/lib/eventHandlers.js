@@ -32,10 +32,11 @@ export const handleStreamOffline = async (event) => {
     return;
   }
   const [notif] = findStreamResult.notifications;
-  const { data: video } = await twitch.videos.getVideosByUser(
+  const { data } = await twitch.videos.getVideosByUser(
     event.broadcaster_user_id,
     { limit: 1, orderBy: "time" }
   );
+  const [video] = data;
   if (!video) {
     console.log(`Video for ${event.broadcaster_user_name} not found.`);
     return;
