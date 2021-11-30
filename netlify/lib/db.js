@@ -59,11 +59,12 @@ export const updateStream = async (stream_id) => {
   return updateStream;
 };
 
-export const saveNotification = async (stream_id, message_ts) => {
+export const saveNotification = async (stream_id, message) => {
+  const { ts: message_ts, channel: channel_id } = message;
   await prisma.notifications.create({
     data: {
       stream_id,
-      channel_id: process.env.SLACK_CHANNEL_ID,
+      channel_id,
       message_ts
     }
   });

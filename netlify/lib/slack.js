@@ -11,7 +11,7 @@ export const sendOnline = async (stream, streamer) => {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `🔴 ${streamer.name} is online. ${stream.title}`
+          text: `🔴 ${streamer.name} is online.\n${stream.title}`
         },
         accessory: {
           type: "image",
@@ -27,7 +27,7 @@ export const sendOnline = async (stream, streamer) => {
         image_url: `${stream.thumbnailUrl.replace(
           "{width}x{height}",
           "1280x720"
-        )}`,
+        )}?q=${stream.id}`,
         alt_text: `${stream.title}`
       },
       {
@@ -59,7 +59,7 @@ export const sendOffline = async (notif, video, streamer) => {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `${streamer.displayName} was online.\n ${video.title}`
+          text: `${streamer.displayName} was online.\n${video.title}`
         },
         accessory: {
           type: "image",
