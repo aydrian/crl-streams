@@ -32,7 +32,7 @@ export const sendOnline = async (stream, streamer, game) => {
         image_url: `${stream.thumbnailUrl.replace(
           "{width}x{height}",
           "1280x720"
-        )}`,
+        )}?q=${stream.id}`,
         alt_text: `${stream.title}`
       },
       {
