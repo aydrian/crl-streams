@@ -1,0 +1,5 @@
+#!/bin/sh
+TWITCH_CLIENT_ID=$(ntl env:get TWITCH_CLIENT_ID)
+TWITCH_CLIENT_SECRET=$(ntl env:get TWITCH_CLIENT_SECRET)
+twitch configure -i $TWITCH_CLIENT_ID -s $TWITCH_CLIENT_SECRET
+twitch token

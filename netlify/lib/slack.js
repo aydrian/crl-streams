@@ -2,16 +2,21 @@ import { WebClient } from "@slack/web-api";
 
 const client = new WebClient();
 
-export const sendOnline = async (stream, streamer) => {
+export const sendOnline = async (stream, streamer, game) => {
   const result = await client.chat.postMessage({
     token: process.env.SLACK_BOT_TOKEN,
     channel: process.env.SLACK_CHANNEL_ID,
+    text: `🔴 ${streamer.name} is online.`,
     blocks: [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `🔴 ${streamer.name} is online.` }
+      },
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `🔴 ${streamer.name} is online. ${stream.title}`
+          text: `*<https://twitch.tv/${streamer.displayName}|${stream.title}>*`
         },
         accessory: {
           type: "image",
@@ -29,6 +34,20 @@ export const sendOnline = async (stream, streamer) => {
           "1280x720"
         )}`,
         alt_text: `${stream.title}`
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            alt_text: game.name,
+            image_url: game.boxArtUrl,
+            type: "image"
+          },
+          {
+            text: `Playing ${game.name}`,
+            type: "mrkdwn"
+          }
+        ]
       },
       {
         type: "actions",
@@ -49,17 +68,22 @@ export const sendOnline = async (stream, streamer) => {
   return result;
 };
 
-export const sendOffline = async (notif, video, streamer) => {
+export const sendOffline = async (notif, video, streamer, game) => {
   const result = await client.chat.update({
     token: process.env.SLACK_BOT_TOKEN,
     channel: notif.channel_id,
     ts: notif.message_ts,
+    text: `${streamer.name} was online.`,
     blocks: [
+      {
+        type: "header",
+        text: { type: "plain_text", text: `${streamer.name} was online.` }
+      },
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `${streamer.displayName} was online.\n ${video.title}`
+          text: `*<${video.url}|${video.title}>*`
         },
         accessory: {
           type: "image",
@@ -79,13 +103,27 @@ export const sendOffline = async (notif, video, streamer) => {
         alt_text: `${video.title}`
       },
       {
+        type: "context",
+        elements: [
+          {
+            alt_text: game.name,
+            image_url: game.boxArtUrl,
+            type: "image"
+          },
+          {
+            text: `Playing ${game.name}`,
+            type: "mrkdwn"
+          }
+        ]
+      },
+      {
         type: "actions",
         elements: [
           {
             type: "button",
             text: {
               type: "plain_text",
-              text: "Watch",
+              text: "Watch VOD",
               emoji: true
             },
             url: video.url

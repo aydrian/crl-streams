@@ -12,7 +12,8 @@ export const handleStreamOnline = async (event) => {
   }
   const streamer = await stream.getUser();
   await saveStream(stream, streamer);
-  const message = await sendOnline(stream, streamer);
+  const game = await stream.getGame();
+  const message = await sendOnline(stream, streamer, game);
   await saveNotification(stream.id, message.ts);
 };
 
@@ -42,5 +43,6 @@ export const handleStreamOffline = async (event) => {
     return;
   }
   const streamer = await video.getUser();
-  await sendOffline(notif, video, streamer);
+  const game = await twitch.games.getGameByName(findStreamResult.game_name);
+  await sendOffline(notif, video, streamer, game);
 };

@@ -35,6 +35,7 @@ export const findStream = async (streamer_id) => {
     },
     select: {
       id: true,
+      game_name: true,
       notifications: true
     },
     where: {
