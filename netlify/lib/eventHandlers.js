@@ -14,7 +14,7 @@ export const handleStreamOnline = async (event) => {
   await saveStream(stream, streamer);
   const game = await stream.getGame();
   const message = await sendOnline(stream, streamer, game);
-  await saveNotification(stream.id, message.ts);
+  await saveNotification(stream.id, message);
 };
 
 export const handleStreamOffline = async (event) => {
