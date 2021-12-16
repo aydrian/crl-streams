@@ -1,6 +1,6 @@
 [build]
 command = "npm run build"
-publish = "public"
+publish = ".next"
 
 [[redirects]]
 from = "/webhooks/twitch"
@@ -9,3 +9,6 @@ status = 200
 
 [functions]
 node_bundler = "esbuild"
+
+[[plugins]]
+package = "@netlify/plugin-nextjs"
