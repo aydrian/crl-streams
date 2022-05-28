@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 model streamers {
-  id                String          @id
+  id                String          @id(map: "primary")
   login             String
   profile_image_url String
   streams           streams[]
@@ -16,22 +16,22 @@ model streamers {
 }
 
 model streams {
-  id            String          @id
+  id            String          @id(map: "primary")
   title         String?
   view_count    BigInt?
   game_name     String?
   started_at    DateTime?       @db.Timestamptz(6)
   ended_at      DateTime?       @db.Timestamptz(6)
   streamer_id   String
-  streamer      streamers       @relation(fields: [streamer_id], references: [id])
+  streamer      streamers       @relation(fields: [streamer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_streamer_id_ref_streamers")
   notifications notifications[]
 }
 
 model subscriptions {
-  id          String    @id
+  id          String    @id(map: "primary")
   type        String
   streamer_id String
-  streamer    streamers @relation(fields: [streamer_id], references: [id])
+  streamer    streamers @relation(fields: [streamer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_streamer_id_ref_streamers")
 }
 
 model notifications {
@@ -39,5 +39,5 @@ model notifications {
   channel_id String
   message_ts String
   stream_id  String
-  stream     streams @relation(fields: [stream_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stream     streams @relation(fields: [stream_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_stream_id_ref_streams")
 }
