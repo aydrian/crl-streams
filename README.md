@@ -1,5 +1,8 @@
 # Cockroach Labs Streams
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e4f2b5c5-78fb-4aac-8a99-b84dfeb1e6c6/deploy-status)](https://app.netlify.com/sites/crl-streams/deploys)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Overlays
 
 ### Emote Drop
